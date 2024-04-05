@@ -1,4 +1,4 @@
 flask
-vanna[snowflake]
+vanna[chromadb,openai,snowflake]
 db-dtypes
 python-dotenv

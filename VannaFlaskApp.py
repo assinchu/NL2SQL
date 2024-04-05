@@ -22,10 +22,10 @@ conn = None
 class MyVanna(ChromaDB_VectorStore, OpenAI_Chat):
     def __init__(self, config=None):
         client = AzureOpenAI(
-            api_key="2bcaa16d6acd4f5d8f659986ecc02e00",
-            api_version="2023-09-15-preview",
-            azure_endpoint="https://resource-openai-engtech-dsa.openai.azure.com/",
-            azure_deployment="model-gpt35-engtech-dsa"
+            api_key="",
+            api_version="",
+            azure_endpoint="",
+            azure_deployment=""
         )
         ChromaDB_VectorStore.__init__(self, config=config)
         #Ollama.__init__(self, config=config)
@@ -240,7 +240,7 @@ class VannaFlaskApp:
 
                 global conn
                 if conn is None or conn.closed:
-                    vn.connect_to_postgres(host='prwf-pgdb', dbname='prwfprd', user='prwf_ai_llm_user', password='PRWgNas5Xyz@$BcdpKLm', port='5432')
+                    vn.connect_to_postgres(host='', dbname='', user='', password='', port='')
 
                 df = vn.run_sql(sql=sql)
 
@@ -517,37 +517,13 @@ class VannaFlaskApp:
 
 if __name__ == '__main__':
     vn = MyVanna(config={'n_results':5})
-    vn.connect_to_postgres(host='prwf-pgdb', dbname='prwfprd', user='prwf_ai_llm_user', password='PRWgNas5Xyz@$BcdpKLm', port='5432')
-    '''vn.train(ddl="""
-            CREATE TABLE pr ( id COMMENT 'PR Number', category, synopsis COMMENT 'PR summary', confidential COMMENT 'PR is visible to customers or not', class COMMENT 'PR classification', submitter_id varchar, rli varchar COMMENT 'Related RLI', arrival_date timestamptz, committed_in varchar, keywords varchar, description text , duplicate_prs COMMENT 'List of PRs that are duplicates of this PR', keywords varchar, root_cause varchar, functional_area varchar COMMENT 'Severity of the issue to the customer', customer_escalation_owner COMMENT 'writer doing documentation for this PR' product varchar, platform varchar, cust_visible_behavior_changed varchar COMMENT 'Does the fix cause product changes', originally_reported_in varchar, found_during varchar, resolved_in varchar, related_prs varchar, problem_level varchar, pr_state varchar, security_vulnerability varchar, latest_summary_status varchar COMMENT 'latest status/progress', symptom varchar COMMENT 'How did you know that the event or problem occurred', workaround varchar, workaround_provided varchar,
-      CONSTRAINT pr_pkey PRIMARY KEY (id)); """)
-
-    vn.train(ddl="""
-            CREATE TABLE scope ( id numeric NOT NULL COMMENT 'Referene key to PR number', identifier COMMENT 'Scope number' planned_release varchar, branch varchar, customer_escalation varchar, blocker varchar, code_review_link_id varchar, code_review_status varchar, state varchar, resolution varchar, target varchar, verified_in varchar, created timestamptz, updated timestamptz, verify_resolution_date timestamptz, closed_date timestamptz, responsible varchar, dev_owner varchar, committed_release varchar COMMENT 'Release associated with the most recent commit to the scope', conf_committed_release varchar, state_last_modified timestamptz, resolution_reason varchar, customer varchar, originator varchar, reported_in varchar, reported_in_cases COMMENT 'Case IDs where customer reported the problem', commit_approval_status varchar, commit_approver varchar, commit_request_link_id varchar, scope_acceptance_status varchar, verification_status varchar, fix_eta_scope timestamptz, scope_product_group varchar, scope_platform COMMENT 'Platform(s) associated with this PR', scope_product_series varchar, systest_owner COMMENT 'Test or QA engineer verifying the fix', CONSTRAINT scope_pkey PRIMARY KEY (scope_id), CONSTRAINT fk_scope_id FOREIGN KEY (id) REFERENCES prdb_junos.pr(id)); """)
-    vn.train(
-	    question="how many scope still in 'ready-to-commit' state for planed release 23.4R2",
-	    sql="SELECT COUNT(*) FROM scope WHERE state = 'ready-to-commit' AND planned_release = '23.4R2';"
-    )
-
-    vn.train(
-	    question="What is the breakdown of scopes by responsible person in planned release 24.2R1-EVO?",
-	    sql="SELECT responsible, COUNT(*) AS scope_count FROM scope WHERE planned_release = '24.2R1-EVO' GROUP BY responsible;"
-    )
+    vn.connect_to_postgres(host='', dbname='', user='', password='', port='')
 
     vn.train(
 	    question="Can you provide a breakdown of the scopes by product group for release 23.4R2?",
 	    sql="SELECT scope_product_group, COUNT(*) as scope_count FROM scope WHERE committed_release = '23.4R2' GROUP BY scope_product_group;"
     )
 
-    vn.train(
-	    question="How many PRs were submitted by each submitter in original release 23.4R2?",
-	    sql="SELECT submitter_id, COUNT(*) AS num_prs FROM pr WHERE originally_reported_in = '23.4R2' GROUP BY submitter_id"
-    )
-
-    vn.train(
-	    question="What are the different states for scopes in planned release 23.4R2, group by state?",
-	    sql="SELECT state, COUNT(*)  FROM scope  WHERE planned_release = '23.4R2' GROUP BY state;"
-    )'''
     vn.static_documentation = "If the user asks the same question twice, repeat the answer"
     #vanna_flask_app = VannaFlaskApp(vn)
     vanna_flask_app = VannaFlaskApp(vn,
